@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>黄金蜜饼-更新日志</title>
+    <!-- logo -->
+	<link rel="icon" href="../images/favicon.ico" type="images/x-icon" /> 
+    <link rel="stylesheet" href="../css/changelog.css">
+</head>
+<body>
+    <header>
+        <div class="list">
+            <ul class="navlist">
+                <!-- 导航菜单栏 -->
+                <li><a href="../HomePage/homepage.html">首页</a></li>
+                <li><a href="../About/about.html">关于</a></li>
+                <li><a href="../ChangeLog/changelog.html">更新日志 </a></li>
+             </ul>
+        </div>
+    </header>
+    <!-- 目标页面 -->
+    <section class="page">
+        <div class="container">
+            <div class="page-header">
+                <h1>更新日志</h1>
+                <p>征途之所以伟大<br>史诗之所以壮阔<br>皆因万物终有逝去之时</p>
+            </div>
+            <!-- 2025.07.04 -->
+             <div class="changelogs-container">             
+                <div class="changelog">
+                    <div class="timeline">2025年07月04日</div>
+                    <h3><i class="fas fa-globe"></i>优化界面，填充文本</h3>
+                    <p>在多个页面中进行文本填充以及在特定板块中添加详细的背景资料。</p>
+                </div>
+            </div>
+            <!-- 2025.06.21 -->
+            <div class="changelogs-container">             
+                <div class="changelog">
+                    <div class="timeline">2025年06月21日</div>
+                    <h3><i class="fas fa-globe"></i>搭建基础框架</h3>
+                    <p>更新了首页、关于以及更新日志页面。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer id="contact">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>关于本站</h3>
+                    <p>小敌小敌 我们喜欢你</p>
+                    
+                </div>
+                
+                <div class="footer-column">
+                    <h3>联系我</h3>
+                    <ul>
+                        <li><a href="#"><i class="fas fa-envelope"></i> yvettetung@foxmail.com</a></li>
+                        <li><a href="#"><i class="fas fa-QQ"></i> QQ: 2471207300</a></li>
+                        <li><a href="#"><i class="fas fa-bilibili"></i> bilibili:YvetteTung</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>yvette tung</p>
+                <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer" 
+                style="color: #bdc3c7; text-decoration: none;">
+		            苏ICP备2025170548号
+	            </a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    window.scrollTo({
+                        top: target.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
