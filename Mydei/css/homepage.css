@@ -40,7 +40,8 @@
         color: #fff;
     }
 /* 当前活动导航样式 */
-    .navlist li.active a{
+    .navlist li.active a,
+    .navlist a[aria-current="page"]{
         /* 设置选中状态 */
         background-color: #612000;
         color: #fff;
@@ -345,7 +346,10 @@
         }
 
         .feature-card {
+            display: block;
             background: white;
+            color: inherit;
+            text-decoration: none;
             border-radius: 15px;
             overflow: hidden;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
@@ -357,6 +361,11 @@
         .feature-card:hover {
             transform: translateY(-10px);
             box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-card:focus-visible {
+            outline: 3px solid var(--primary);
+            outline-offset: 4px;
         }
 
 /* 页脚样式 */

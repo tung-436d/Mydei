@@ -38,7 +38,8 @@
         color: #fff;
     }
 /* 当前活动导航样式 */
-    .navlist li.active a{
+    .navlist li.active a,
+    .navlist a[aria-current="page"]{
         /* 设置选中状态 */
         background-color: #612000;
         color: #fff;
