@@ -3,43 +3,40 @@
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="theme-color" content="#0b0909">
   <meta name="description" content="崩坏：星穹铁道万敌角色专题站，整理角色资料、战斗机制、培养思路与相关故事。">
-  <title>万敌｜征服命运的冠冕</title><link rel="icon" href="./images/favicon.ico" type="image/x-icon"><link rel="stylesheet" href="./css/index.css">
+  <title>万敌｜征服命运的冠冕</title><link rel="stylesheet" href="./src/styles/site.css"><script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"万敌角色专题站","inLanguage":"zh-CN"}</script>
 </head>
 <body>
   <a class="skip-link" href="#main-content">跳至主要内容</a>
-  <header class="site-header" data-header><nav class="nav-shell" aria-label="主要导航">
-    <a class="brand" href="#top" aria-label="万敌专题站首页"><span class="brand-mark" aria-hidden="true">M</span><span><strong>万敌</strong><small>MYDEI ARCHIVE</small></span></a>
-    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" data-nav-toggle><span class="sr-only">打开导航</span><span></span><span></span></button>
-    <div class="nav-links" id="site-nav" data-nav-links><a href="#profile">概览</a><a href="#combat">技能</a><a href="#build">养成</a><a href="#team">配队</a><a href="#story">故事</a></div>
-  </nav></header>
+  <!--SITE_HEADER-->
   <main id="main-content">
     <section class="hero" id="top" aria-labelledby="hero-title">
       <div class="hero-text"><p class="eyebrow">THE CROWN OF STRIFE · 角色专题</p><h1 id="hero-title"><span>万敌</span><small>MYDEIMOS</small></h1>
-        <blockquote>“无论身在何处，直至我流尽最后一滴血，也不会再让我的子民作出无谓的牺牲。”</blockquote>
-        <div class="hero-actions"><a class="button primary" href="#profile">查看角色资料</a><a class="button ghost" href="#build">查看玩法建议</a></div>
-        <p class="source-note">引文沿用本站原有内容；角色数据以“已收录 / 待核验”状态区分。</p>
+        <blockquote>一个以万敌为唯一主角、兼顾角色设定、战斗理解、养成决策与视觉气质的中文玩家专题。</blockquote>
+        <div class="hero-actions"><a class="button primary" href="#overview">查看角色资料</a><a class="button ghost" href="#build">查看玩法建议</a></div>
+        <p class="source-note">站点原创导览 · 具体角色资料只有在来源与版本复核后发布。</p>
       </div>
-      <div class="hero-art" aria-label="万敌手持长枪立于战场的角色插画"><picture><source media="(max-width: 768px)" srcset="./images/img_mydei-768.webp" type="image/webp"><source srcset="./images/img_mydei-1280.webp" type="image/webp"><img src="./images/img_mydei.jpg" alt="万敌手持长枪立于战场，身后是红色战旗与士兵" width="1280" height="1280" fetchpriority="high" decoding="async"></picture><span class="hero-seal" aria-hidden="true">悬锋<br>归乡</span></div>
-      <a class="scroll-cue" href="#profile">向下探索<span aria-hidden="true">↓</span></a>
+      <div class="hero-art" aria-hidden="true"><div class="hero-monogram">万</div><span class="hero-seal">内容<br>审校中</span></div>
+      <a class="scroll-cue" href="#overview">向下探索<span aria-hidden="true">↓</span></a>
     </section>
-    <section class="section" id="profile" aria-labelledby="profile-title">
+    <section class="section" id="overview" aria-labelledby="profile-title">
       <div class="section-heading"><p class="eyebrow">01 · CHARACTER FILE</p><h2 id="profile-title">角色档案</h2><p>只呈现仓库已有内容；尚无可靠来源的字段不会补写成官方结论。</p></div>
-      <div class="profile-layout"><figure class="portrait-card"><img src="./images/mydei.png" alt="万敌主题杂志风角色插画" width="600" height="878" loading="lazy"><figcaption>站内收藏插画 · 原有素材</figcaption></figure>
-        <div class="profile-content"><dl class="stat-grid" data-profile><!--PROFILE--></dl><article class="quote-card"><span class="quote-mark" aria-hidden="true">“</span><p>最初，我的生活便是在深渊中与怪物搏斗、厮杀，从黎明破晓至黑夜降临，如此往复。</p><footer>— 站内原有角色引文</footer></article></div></div>
+      <div class="profile-layout"><div class="portrait-card portrait-placeholder" role="img" aria-label="角色视觉素材正在进行授权审核">角色视觉<small>素材授权审核中</small></div>
+        <div class="profile-content"><dl class="stat-grid" data-profile><!--PROFILE--></dl><article class="quote-card"><p>本站先建立可追溯的内容结构，再接入经内容负责人签字的角色事实与玩法建议。</p><footer>站点原创说明</footer></article></div></div>
     </section>
-    <section class="section" id="combat" aria-labelledby="combat-title">
+    <section class="section" id="skills" aria-labelledby="combat-title">
       <div class="section-heading"><p class="eyebrow">02 · COMBAT ARCHIVE</p><h2 id="combat-title">战斗档案</h2><p>使用标签页分组查看技能、行迹与星魂。具体倍率和效果待可靠来源核验。</p></div>
       <div class="tabs" data-tabs><div class="tab-list" aria-label="战斗档案分类">
         <button data-tab="panel-skills">技能</button><button data-tab="panel-traces">行迹</button><button data-tab="panel-eidolons">星魂</button>
       </div><div id="panel-skills"><div class="archive-grid" data-skills><!--SKILLS--></div></div><div id="panel-traces"><div class="archive-grid" data-traces><!--TRACES--></div></div><div id="panel-eidolons"><div class="archive-grid" data-eidolons><!--EIDOLONS--></div></div></div>
     </section>
     <section class="section" id="build" aria-labelledby="build-title"><div class="section-heading"><p class="eyebrow">03 · FIELD NOTES</p><h2 id="build-title">培养建议</h2><p>在数据核验完成前，先提供可替换的决策框架，不展示未经来源支持的套装与数值。</p></div><div class="build-grid" data-build><!--BUILDS--></div></section>
-    <section class="section" id="team" aria-labelledby="team-title"><div class="section-heading"><p class="eyebrow">04 · FORMATION</p><h2 id="team-title">配队与输出循环</h2><p>以下为编队职责模板，不等同于已验证攻略。</p></div><div class="team-layout"><ol class="rotation" data-rotation><!--ROTATION--></ol><aside class="notice" aria-labelledby="team-notice"><span aria-hidden="true">!</span><div><h3 id="team-notice">待实战核验</h3><p>角色名称、速度顺序、能量节点与技能点消耗均留待可靠攻略或游戏内测试补全。</p></div></aside></div></section>
-    <section class="section story-section" id="story" aria-labelledby="story-title"><div class="story-art"><img src="./images/golden honeycake.png" alt="万敌端着黄金蜜饼的装饰插画" width="600" height="878" loading="lazy"></div><div class="story-copy"><p class="eyebrow">05 · REMEMBRANCE</p><h2 id="story-title">故事与馆藏</h2><p class="lead">从悬锋旧事到黄金蜜饼，本站原有馆藏记录了关于迈德漠斯的片段。长篇原文继续保留在独立的图书馆页面。</p><div class="story-links"><a href="./About/Library/library.html"><span>01</span><strong>歌耳巴尼帕耳图书馆藏</strong><small>查看原有长篇档案 →</small></a><a href="./About/about.html"><span>02</span><strong>关于黄金蜜饼</strong><small>查看本站原有说明 →</small></a></div></div></section>
-    <section class="section" id="gallery" aria-labelledby="gallery-title"><div class="section-heading"><p class="eyebrow">06 · GALLERY</p><h2 id="gallery-title">画廊</h2><p>点击图片可查看大图；非首屏图片采用懒加载，并提供加载失败提示。</p></div><div class="gallery" data-gallery><!--GALLERY--></div></section>
+    <section class="section" id="teams" aria-labelledby="team-title"><div class="section-heading"><p class="eyebrow">04 · FORMATION</p><h2 id="team-title">配队建议</h2><p>配队职责、替代位和适用场景将在攻略作者与版本信息确认后发布。</p></div><div class="build-grid"><!--TEAMS--></div></section>
+    <section class="section" id="rotation" aria-labelledby="rotation-title"><div class="section-heading"><p class="eyebrow">05 · ROTATION</p><h2 id="rotation-title">机制与输出循环</h2><p>循环步骤必须建立在已核验的技能机制与速度轴上。</p></div><ol class="rotation" data-rotation><!--ROTATION--></ol></section>
+    <section class="section story-section" id="story" aria-labelledby="story-title"><div class="story-placeholder" role="img" aria-label="馆藏内容正在进行来源与版权审核">馆藏审计<small>来源 · 版权 · 剧透等级</small></div><div class="story-copy"><p class="eyebrow">06 · REMEMBRANCE</p><h2 id="story-title">故事与馆藏</h2><p class="lead">原站馆藏内容已经完整保留在源文件中。公开构建暂不发布未经来源与版权审计的长篇文本。</p><div class="story-links"><a href="./library/"><span>01</span><strong>查看馆藏审计状态</strong><small>进入统一馆藏页面 →</small></a><a href="./sources/"><span>02</span><strong>来源与内容规则</strong><small>查看可追溯信息 →</small></a></div></div></section>
+    <section class="section" id="gallery" aria-labelledby="gallery-title"><div class="section-heading"><p class="eyebrow">07 · GALLERY</p><h2 id="gallery-title">画廊</h2><p>只有来源与授权审核通过的素材才会在此展示。</p></div><div class="gallery" data-gallery><!--GALLERY--></div></section>
     <!--SOURCE_NOTICE-->
   </main>
-  <footer class="site-footer"><div><a class="brand footer-brand" href="#top"><span class="brand-mark" aria-hidden="true">M</span><span><strong>万敌</strong><small>MYDEI ARCHIVE</small></span></a><p>由玩家整理的非官方角色专题站。</p></div><div><h2>内容说明</h2><p>《崩坏：星穹铁道》及相关角色归其权利方所有。本站不代表或隶属于游戏官方。未核验数据不会作为官方事实展示；现有图片的来源与许可仍待站长审核，对外发布前需完成素材审计。</p></div><div><h2>保留入口</h2><p><a href="./HomePage/homepage.html">旧版首页</a> · <a href="./ChangeLog/changelog.html">更新日志</a> · <a href="mailto:tung-favorli@outlook.com">联系站长</a></p></div><p class="footer-bottom">玩家专题 · 内容状态：持续整理中</p></footer>
+  <!--SITE_FOOTER-->
   <dialog class="lightbox" data-lightbox aria-label="画廊大图预览"><button type="button" data-lightbox-close aria-label="关闭预览">×</button><img data-lightbox-image alt=""><p data-lightbox-caption></p></dialog>
   <script type="module" src="./src/app.ts"></script>
 </body></html>

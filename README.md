@@ -19,11 +19,13 @@ pnpm dev
 pnpm lint
 pnpm typecheck
 pnpm test
+pnpm exec playwright install chromium
+pnpm test:e2e
 pnpm build
 pnpm check
 ```
 
-生产文件输出到 `dist/`。构建配置包含专题首页以及现有首页、关于、馆藏、纷争剧作和更新日志页面，保留旧路径可用性。
+生产文件输出到 `dist/`。公开入口为 `/`、`/sources/`、`/library/`、`/about/` 和 `/changelog/`；旧 HTML 路径仅保留兼容跳转。端到端测试覆盖 360、390、768、1024、1280 和 1440 像素宽度。
 
 ## 内容维护
 
@@ -31,7 +33,7 @@ pnpm check
 - `pnpm check:content` 会检查重复 ID、引用、来源、作者、版本、复核日期、行迹依赖和素材状态。
 - 未经可靠来源核验的角色事实必须保持“待核验”，不得填写推测数值或剧情。
 - `vite.config.ts` 在开发和构建阶段把核心内容静态写入 HTML，增强脚本失效时正文仍可阅读。
-- 现有长篇馆藏暂时保留在旧页面，迁移前需逐段校对来源与版权状态。
+- 现有长篇馆藏与图片保留在源文件中；来源和版权审核完成前不会进入公开构建。
 - 不提交 `node_modules/` 或 `dist/`，不在未授权情况下执行部署。
 
 ## 内容审核流程
