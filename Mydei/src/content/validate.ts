@@ -12,7 +12,6 @@ function validateMeta(meta:ContentMeta,path:string,sourceIds:Set<string>,authorI
  meta.authorIds.filter(id=>!authorIds.has(id)).forEach(id=>issues.push({code:'AUTHOR_REF',path,message:`作者 ${id} 不存在`}));
  if(meta.kind==='official'&&meta.sourceIds.length===0)issues.push({code:'OFFICIAL_SOURCE',path,message:'官方信息必须有来源'});
  if((meta.kind==='recommendation'||meta.kind==='original')&&meta.authorIds.length===0)issues.push({code:'CONTENT_AUTHOR',path,message:'建议或原创内容必须有作者'});
- if(meta.kind==='recommendation'&&meta.applicableVersions.length===0)issues.push({code:'CONTENT_VERSION',path,message:'玩法建议必须声明适用版本'});
 }
 
 export function validateContent(bundle:ContentBundle):ValidationIssue[]{
@@ -22,7 +21,7 @@ export function validateContent(bundle:ContentBundle):ValidationIssue[]{
  duplicates(bundle.assets.map(item=>item.id)).forEach(id=>issues.push({code:'DUPLICATE_ASSET',path:'assets',message:`重复 ID：${id}`}));
  bundle.sources.forEach((source,index)=>{if(!source.accessedAt)issues.push({code:'SOURCE_ACCESS_DATE',path:`sources.${index}`,message:'来源缺少访问日期'});if(source.coveredFieldPaths.length===0)issues.push({code:'SOURCE_COVERAGE',path:`sources.${index}`,message:'来源缺少覆盖字段'});});
  bundle.assets.forEach((asset,index)=>{const path=`assets.${index}`;if(!asset.creatorOrRightsHolder)issues.push({code:'ASSET_RIGHTS_HOLDER',path,message:'素材缺少创作者或权利方状态'});if(!asset.alt.trim()&&asset.usage!=='decorative')issues.push({code:'ASSET_ALT',path,message:'非装饰图片必须有替代文本'});if(asset.width<=0||asset.height<=0)issues.push({code:'ASSET_SIZE',path,message:'图片尺寸必须大于零'});asset.sourceIds.filter(id=>!sourceIds.has(id)).forEach(id=>issues.push({code:'SOURCE_REF',path,message:`来源 ${id} 不存在`}));});
- bundle.stats.forEach((field,index)=>{validateMeta(field.meta,`stats.${index}`,sourceIds,authorIds,bundle.release.buildDate,issues);if(field.meta.kind==='unconfirmed'&&field.value&&numericClaim.test(field.value))issues.push({code:'UNCONFIRMED_VALUE',path:`stats.${index}`,message:'待确认字段不得包含确定数值'});});
+ bundle.stats.forEach((field,index)=>{validateMeta(field.meta,`stats.${index}`,sourceIds,authorIds,bundle.release.buildDate,issues);if(field.meta.kind==='unconfirmed'&&field.value&&numericClaim.test(field.value))issues.push({code:'UNCONFIRMED_VALUE',path:`stats.${index}`,message:'待补充字段不得包含确定数值'});});
  const traceIds=new Set(bundle.traces.nodes.map(node=>node.id));duplicates(bundle.traces.nodes.map(node=>node.id)).forEach(id=>issues.push({code:'DUPLICATE_TRACE',path:'traces',message:`重复 ID：${id}`}));
  bundle.traces.nodes.forEach((node,index)=>{validateMeta(node,`traces.${index}`,sourceIds,authorIds,bundle.release.buildDate,issues);node.prerequisiteIds.filter(id=>!traceIds.has(id)).forEach(id=>issues.push({code:'TRACE_REF',path:`traces.${index}`,message:`前置行迹 ${id} 不存在`}));});
  const visiting=new Set<string>(),visited=new Set<string>(),nodes=new Map(bundle.traces.nodes.map(node=>[node.id,node]));const visit=(id:string)=>{if(visiting.has(id)){issues.push({code:'TRACE_CYCLE',path:`traces.${id}`,message:'行迹依赖存在环'});return}if(visited.has(id))return;visiting.add(id);nodes.get(id)?.prerequisiteIds.forEach(visit);visiting.delete(id);visited.add(id)};nodes.forEach((_,id)=>visit(id));

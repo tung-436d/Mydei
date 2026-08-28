@@ -16,10 +16,36 @@ test('clean routes render shared, overflow-free pages',async({page})=>{
     await expect(page.locator('h1')).toContainText(heading);
     await expect(page.locator('.site-header')).toBeVisible();
     await expect(page.locator('.site-footer')).toBeVisible();
+    const disclaimer=page.locator('.footer-disclaimer');
+    await expect(disclaimer).toContainText('本站为万敌厨创作的非官方网站。');
+    await expect(disclaimer).toContainText('游戏相关的图像和资产的版权和商标权归 HoYoverse 所有。');
     const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);
     expect(overflow,`${path} has horizontal overflow`).toBeLessThanOrEqual(1);
   }
   expect(pageErrors).toEqual([]);
+});
+
+test('provided content is visible without review blockers',async({page})=>{
+  await page.goto('/');
+  await expect(page.getByRole('heading',{name:'踏破征途的誓言'})).toBeVisible();
+  await expect(page.locator('#panel-eidolons h3',{hasText:'寒风雕琢不屈的脊梁'})).toBeAttached();
+  await expect(page.locator('[data-gallery] img')).toHaveCount(4);
+  const text=await page.locator('body').innerText();
+  for(const blocked of ['内容审核中','授权待确认','核验后发布','素材授权审核中','馆藏审计'])expect(text).not.toContain(blocked);
+});
+
+test('footer disclaimer meets WCAG AA contrast',async({page})=>{
+  await page.goto('/');
+  const contrast=await page.locator('.footer-disclaimer').evaluate(element=>{
+    const parse=(value:string)=>value.match(/[\d.]+/g)?.slice(0,3).map(Number)??[0,0,0];
+    const luminance=(rgb:number[])=>{
+      const channels=rgb.map(value=>{const normalized=value/255;return normalized<=.04045?normalized/12.92:((normalized+.055)/1.055)**2.4});
+      return .2126*(channels[0]??0)+.7152*(channels[1]??0)+.0722*(channels[2]??0);
+    };
+    const style=getComputedStyle(element),foreground=luminance(parse(style.color)),background=luminance(parse(getComputedStyle(document.body).backgroundColor));
+    return(Math.max(foreground,background)+.05)/(Math.min(foreground,background)+.05);
+  });
+  expect(contrast).toBeGreaterThanOrEqual(4.5);
 });
 
 test('mobile navigation and keyboard tabs are operable',async({page})=>{
