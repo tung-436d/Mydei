@@ -1,4 +1,4 @@
-import type{Eidolon,EidolonLevel}from'../../models/content';import{officialMeta}from'./meta';
+import type{Eidolon,EidolonLevel}from'../../models/content';
 const entries:[EidolonLevel,string,string][]=[
  [1,'寒风雕琢不屈的脊梁','【弑神登神】对主目标造成的伤害倍率提高30%，且变成对敌方全体造成等同于主目标伤害倍率的虚数属性伤害。'],
  [2,'纷争见证尸骸的喉鸣','【血仇】状态期间，万敌造成的伤害无视敌方目标15%的防御力，且受到治疗时会将40%的治疗数值转化为充能，累计转化的充能不超过40点。任意单位行动后重置可累计的充能。'],
@@ -7,4 +7,4 @@ const entries:[EidolonLevel,string,string][]=[
  [5,'兵戈雕刻躯身的烈焰','终结技等级+2，最多不超过15级；天赋等级+2，最多不超过15级。'],
  [6,'往日攀陟沉积的血山','进入战斗时立刻进入【血仇】状态且【弑神登神】所需的充能值降低至100点。'],
 ];
-export const eidolons:Eidolon[]=entries.map(([level,name,description])=>({...officialMeta,id:`eidolon-${level}`,level,name,officialDescription:{id:`eidolon-${level}-description`,paragraphs:[description],meta:officialMeta}}));
+export const eidolons:Eidolon[]=entries.map(([level,name,description])=>({id:`eidolon-${level}`,level,name,description:[description]}));

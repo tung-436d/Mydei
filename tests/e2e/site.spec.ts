@@ -1,105 +1,25 @@
-import{expect,test}from'@playwright/test';
+import{get}from'node:http';import{expect,test}from'@playwright/test';
 
-const cleanRoutes=[
-  ['/',/万敌/],
-  ['/sources/',/来源、版本与勘误/],
-  ['/library/',/故事与馆藏/],
-  ['/about/',/关于本站/],
-  ['/changelog/',/更新日志/],
-]as const;
+const disclaimer=['本站为万敌厨创作的非官方网站。','游戏相关的图像和资产的版权和商标权归 HoYoverse 所有。'];
+const navLabels=['概览','技能','养成','配队','故事','馆藏'];
+const rawGet=(origin:string,path:string)=>new Promise<{status:number;location?:string;body:string}>((resolve,reject)=>{get(`${origin}${path}`,response=>{let body='';response.setEncoding('utf8');response.on('data',chunk=>body+=chunk);response.on('end',()=>resolve({status:response.statusCode??0,location:response.headers.location,body}))}).on('error',reject)});
 
-test('clean routes render shared, overflow-free pages',async({page})=>{
-  const pageErrors:string[]=[];
-  page.on('pageerror',error=>pageErrors.push(error.message));
-  for(const[path,heading]of cleanRoutes){
-    await page.goto(path);
-    await expect(page.locator('h1')).toContainText(heading);
-    await expect(page.locator('.site-header')).toBeVisible();
-    await expect(page.locator('.site-footer')).toBeVisible();
-    const disclaimer=page.locator('.footer-disclaimer');
-    await expect(disclaimer).toContainText('本站为万敌厨创作的非官方网站。');
-    await expect(disclaimer).toContainText('游戏相关的图像和资产的版权和商标权归 HoYoverse 所有。');
-    const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);
-    expect(overflow,`${path} has horizontal overflow`).toBeLessThanOrEqual(1);
-  }
-  expect(pageErrors).toEqual([]);
+test('home and library are complete, shared, and overflow-free',async({page})=>{
+ const pageErrors:string[]=[];page.on('pageerror',error=>pageErrors.push(error.message));
+ for(const[path,heading]of [['/',/万敌/],['/library/',/歌耳巴尼帕耳图书馆藏/]]as const){await page.goto(path);await expect(page.locator('h1')).toContainText(heading);await expect(page.locator('.site-header')).toBeVisible();await expect(page.locator('.site-footer')).toBeVisible();expect(await page.locator('.nav-links a').allTextContents()).toEqual(navLabels);for(const text of disclaimer)await expect(page.locator('.footer-disclaimer')).toContainText(text);const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);expect(overflow,`${path} has horizontal overflow`).toBeLessThanOrEqual(1)}
+ expect(pageErrors).toEqual([]);
 });
 
-test('provided content is visible without review blockers',async({page})=>{
-  await page.goto('/');
-  await expect(page.getByRole('heading',{name:'踏破征途的誓言'})).toBeVisible();
-  await expect(page.locator('#panel-eidolons h3',{hasText:'寒风雕琢不屈的脊梁'})).toBeAttached();
-  await expect(page.locator('[data-gallery] img')).toHaveCount(4);
-  const text=await page.locator('body').innerText();
-  for(const blocked of ['内容审核中','授权待确认','核验后发布','素材授权审核中','馆藏审计'])expect(text).not.toContain(blocked);
-});
+test('provided character content is directly visible',async({page})=>{await page.goto('/');await expect(page.getByRole('heading',{name:'踏破征途的誓言'})).toBeVisible();await expect(page.locator('#panel-eidolons h3',{hasText:'寒风雕琢不屈的脊梁'})).toBeAttached();await expect(page.locator('[data-gallery] img')).toHaveCount(4);const text=await page.locator('body').innerText();for(const blocked of ['内容审核中','授权待确认','核验后发布','待核验','待补充','勘误'])expect(text).not.toContain(blocked)});
 
-test('footer disclaimer meets WCAG AA contrast',async({page})=>{
-  await page.goto('/');
-  const contrast=await page.locator('.footer-disclaimer').evaluate(element=>{
-    const parse=(value:string)=>value.match(/[\d.]+/g)?.slice(0,3).map(Number)??[0,0,0];
-    const luminance=(rgb:number[])=>{
-      const channels=rgb.map(value=>{const normalized=value/255;return normalized<=.04045?normalized/12.92:((normalized+.055)/1.055)**2.4});
-      return .2126*(channels[0]??0)+.7152*(channels[1]??0)+.0722*(channels[2]??0);
-    };
-    const style=getComputedStyle(element),foreground=luminance(parse(style.color)),background=luminance(parse(getComputedStyle(document.body).backgroundColor));
-    return(Math.max(foreground,background)+.05)/(Math.min(foreground,background)+.05);
-  });
-  expect(contrast).toBeGreaterThanOrEqual(4.5);
-});
+test('mobile navigation and keyboard tabs are operable',async({page})=>{await page.goto('/');if((page.viewportSize()?.width??999)>900){await expect(page.locator('[data-nav-links]')).toBeVisible()}else{const toggle=page.locator('[data-nav-toggle]');await expect(toggle).toBeVisible();await toggle.click();await expect(toggle).toHaveAttribute('aria-expanded','true');await page.keyboard.press('Escape');await expect(toggle).toHaveAttribute('aria-expanded','false');await expect(toggle).toBeFocused()}const first=page.locator('[data-tab]').first();await first.focus();await page.keyboard.press('ArrowRight');await expect(page.locator('[data-tab]').nth(1)).toHaveAttribute('aria-selected','true')});
 
-test('mobile navigation and keyboard tabs are operable',async({page})=>{
-  await page.goto('/');
-  if((page.viewportSize()?.width??999)>900){
-    await expect(page.locator('[data-nav-links]')).toBeVisible();
-  }else{
-    const toggle=page.locator('[data-nav-toggle]');
-    await expect(toggle).toBeVisible();
-    await toggle.click();
-    await expect(toggle).toHaveAttribute('aria-expanded','true');
-    await page.keyboard.press('Escape');
-    await expect(toggle).toHaveAttribute('aria-expanded','false');
-    await expect(toggle).toBeFocused();
-  }
-  const first=page.locator('[data-tab]').first();
-  await first.focus();
-  await page.keyboard.press('ArrowRight');
-  await expect(page.locator('[data-tab]').nth(1)).toHaveAttribute('aria-selected','true');
-});
+test('library supports native disclosure, toolbar, and deep links',async({page})=>{await page.goto('/library/');const entries=page.locator('.library-entry');await expect(entries).toHaveCount(17);const second=entries.nth(1);await second.locator('summary').focus();await page.keyboard.press('Enter');await expect(second).toHaveAttribute('open','');await page.locator('[data-library-open-all]').click();expect(await entries.evaluateAll(items=>items.every(item=>(item as HTMLDetailsElement).open))).toBe(true);await page.locator('[data-library-close-all]').click();expect(await entries.evaluateAll(items=>items.every(item=>!(item as HTMLDetailsElement).open))).toBe(true);await page.goto('/library/#archive-02');const target=page.locator('#archive-02');await expect(target).toHaveAttribute('open','');await expect(target.locator('summary')).toBeFocused()});
 
-test('core content remains readable without JavaScript',async({browser,viewport})=>{
-  const context=await browser.newContext({javaScriptEnabled:false,viewport:viewport??{width:1280,height:800}});
-  const page=await context.newPage();
-  await page.goto('http://127.0.0.1:4173/');
-  await expect(page.locator('h1')).toContainText('万敌');
-  await expect(page.locator('#skills')).toBeVisible();
-  await expect(page.locator('[data-nav-links]')).toBeVisible();
-  await expect(page.locator('[data-tab]').first()).toBeHidden();
-  await context.close();
-});
+test('core pages remain readable without JavaScript',async({browser,viewport})=>{const context=await browser.newContext({javaScriptEnabled:false,viewport:viewport??{width:1280,height:800}});const page=await context.newPage();await page.goto('http://127.0.0.1:4173/');await expect(page.locator('#skills')).toBeVisible();await expect(page.locator('[data-nav-links]')).toBeVisible();await page.goto('http://127.0.0.1:4173/library/');await expect(page.locator('.library-entry')).toHaveCount(17);await expect(page.locator('.library-entry').first()).toHaveAttribute('open','');await context.close()});
 
-test('reduced motion disables long transitions',async({page})=>{
-  await page.emulateMedia({reducedMotion:'reduce'});
-  await page.goto('/');
-  const duration=await page.locator('.button').first().evaluate(element=>getComputedStyle(element).transitionDuration);
-  expect(Number.parseFloat(duration)).toBeLessThanOrEqual(0.00001);
-});
+test('secondary text meets WCAG AA contrast',async({page})=>{await page.goto('/library/');const ratio=await page.locator('.library-entry[open] .library-entry__body p').first().evaluate(element=>{const rgb=(value:string)=>value.match(/[\d.]+/g)?.slice(0,3).map(Number)??[0,0,0];const luminance=(values:number[])=>{const channels=values.map(value=>{const normalized=value/255;return normalized<=.04045?normalized/12.92:((normalized+.055)/1.055)**2.4});return .2126*(channels[0]??0)+.7152*(channels[1]??0)+.0722*(channels[2]??0)};const style=getComputedStyle(element),background=getComputedStyle(element.closest('.library-entry__body')!);const foreground=luminance(rgb(style.color)),back=luminance(rgb(background.backgroundColor));return(Math.max(foreground,back)+.05)/(Math.min(foreground,back)+.05)});expect(ratio).toBeGreaterThanOrEqual(4.5)});
 
-test('legacy URLs redirect and 404 page is available',async({page})=>{
-  await page.goto('/HomePage/homepage.html');
-  await expect(page).toHaveURL(/\/#overview$/);
-  const response=await page.goto('/404.html');
-  expect(response?.ok()).toBeTruthy();
-  await expect(page.getByRole('heading',{name:'这一页不在馆藏中'})).toBeVisible();
-});
+test('reduced motion and image failure states are handled',async({page})=>{await page.emulateMedia({reducedMotion:'reduce'});await page.goto('/');const duration=await page.locator('.button').first().evaluate(element=>getComputedStyle(element).transitionDuration);expect(Number.parseFloat(duration)).toBeLessThanOrEqual(.00001);await page.evaluate(()=>{const image=document.createElement('img');image.alt='测试素材';document.querySelector('#gallery')?.append(image);image.src='/definitely-missing-image.webp'});await expect(page.locator('.image-fallback')).toContainText('测试素材')});
 
-test('broken images expose a readable fallback',async({page})=>{
-  await page.goto('/');
-  await page.evaluate(()=>{
-    const image=document.createElement('img');
-    image.alt='测试素材';
-    document.querySelector('#gallery')?.append(image);
-    image.src='/definitely-missing-image.webp';
-  });
-  await expect(page.locator('.image-fallback')).toContainText('测试素材');
-});
+test('legacy route rules and real 404 responses are enforced',async({baseURL},testInfo)=>{test.skip(testInfo.project.name!=='desktop-1440','route matrix only needs one browser project');const origin=baseURL??'http://127.0.0.1:4173';for(const[path,location]of [['/index.html','/'],['/HomePage/homepage.html','/#overview'],['/About/about.html','/library/#golden-honeycake'],['/About/Library/library.html','/library/'],['/About/Record/record.html','/#rotation'],['/About/index.html','/#site-info'],['/about/','/#site-info']]as const){const response=await rawGet(origin,path);expect(response.status,path).toBe(301);expect(response.location,path).toBe(location)}for(const path of ['/ChangeLog/changelog.html','/ChangeLog/index.html','/changelog/','/sources/index.html','/sources/','/not-a-real-page','/404.html']){const response=await rawGet(origin,path);expect(response.status,path).toBe(404);expect(response.body).toContain('这一页不在馆藏中')}});
