@@ -35,6 +35,29 @@ test('home is one Hero with the frozen copy and two page CTAs',async({page})=>{
  for(const blocked of ['查看玩法建议','内容审核中','授权待确认','核验后发布','待核验','待补充','勘误'])expect(text).not.toContain(blocked);
 });
 
+test('requested page headings omit descriptions without leaving placeholder space',async({page})=>{
+ const compactPages=[
+  ['/profile/','浏览万敌已确认的身份、属性、晋阶、行迹与角色介绍。','.profile-intro'],
+  ['/skills/','按稳定锚点浏览普攻、战技形态、终结技、天赋、秘技和附加能力。','.local-nav'],
+  ['/eidolons/','六阶星魂以本地图标与静态图片呈现，断网时仍可阅读完整说明。','.local-nav'],
+ ]as const;
+ for(const[path,removedCopy,nextSelector]of compactPages){
+  await page.goto(path);
+  await expect(page.locator('body')).not.toContainText(removedCopy);
+  const heading=page.locator('.page-heading--compact');
+  await expect(heading).toBeVisible();
+  await expect(heading.locator(':scope>p:not(.eyebrow)')).toHaveCount(0);
+  const gap=await heading.evaluate((element,selector)=>{const next=document.querySelector(selector);if(!next)throw new Error(`Missing ${selector}`);return next.getBoundingClientRect().top-element.getBoundingClientRect().bottom},nextSelector);
+  expect(gap,`${path} heading gap`).toBeLessThanOrEqual(42);
+ }
+ await page.goto('/library/');
+ await expect(page.locator('body')).not.toContainText('十七份站内馆藏以新版深色阅读界面重新编排。选择标题可展开全文，也可使用目录快速抵达篇章。');
+ const hero=page.locator('.library-hero--compact');
+ await expect(hero.locator(':scope>p:not(.eyebrow)')).toHaveCount(0);
+ const titleGap=await hero.evaluate(element=>{const title=element.querySelector('h1'),button=element.querySelector('.button');if(!title||!button)throw new Error('Missing library hero content');return button.getBoundingClientRect().top-title.getBoundingClientRect().bottom});
+ expect(titleGap).toBeLessThanOrEqual(36);
+});
+
 test('profile, skills, eidolons, and gallery expose migrated content',async({page},testInfo)=>{
  test.skip(testInfo.project.name!=='desktop-1440','content matrix only needs one browser project');
  await page.goto('/profile/#stats');await expect(page.locator('#stats')).toBeVisible();await expect(page.locator('#ascension')).toBeAttached();await expect(page.locator('#traces')).toBeAttached();await expect(page.locator('#story')).toBeAttached();
