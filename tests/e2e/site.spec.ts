@@ -84,8 +84,10 @@ test('requested page headings omit descriptions without leaving placeholder spac
  await expect(page.locator('body')).not.toContainText('十七份站内馆藏以新版深色阅读界面重新编排。选择标题可展开全文，也可使用目录快速抵达篇章。');
  const hero=page.locator('.library-hero--compact');
  await expect(hero.locator(':scope>p:not(.eyebrow)')).toHaveCount(0);
- const titleGap=await hero.evaluate(element=>{const title=element.querySelector('h1'),button=element.querySelector('.button');if(!title||!button)throw new Error('Missing library hero content');return button.getBoundingClientRect().top-title.getBoundingClientRect().bottom});
- expect(titleGap).toBeLessThanOrEqual(36);
+ await expect(hero.getByRole('link',{name:'返回角色故事'})).toHaveCount(0);
+ await expect(hero.locator('.button')).toHaveCount(0);
+ const titleGap=await hero.evaluate(element=>{const title=element.querySelector('h1');if(!title)throw new Error('Missing library hero title');return element.getBoundingClientRect().bottom-title.getBoundingClientRect().bottom});
+ expect(titleGap).toBeLessThanOrEqual(60);
 });
 
 test('profile, skills, and eidolons expose migrated content',async({page},testInfo)=>{
