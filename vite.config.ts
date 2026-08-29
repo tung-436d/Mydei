@@ -44,7 +44,7 @@ function staticContent():Plugin{return{
  transformIndexHtml:{order:'pre',handler(html,ctx){return documents.get(ctx.path)??html}},
 }}
 
-function sharedFavicon():Plugin{return{name:'mydei-shared-favicon',transformIndexHtml:{order:'post',handler(html){return html.replace(/<link rel="icon" href="[^"]*favicon\.ico" type="image\/x-icon">/,'<link rel="icon" href="/favicon.ico" type="image/x-icon">')}}}}
+function sharedRootAssets():Plugin{return{name:'mydei-shared-root-assets',transformIndexHtml:{order:'post',handler(html){return html.replace(/<link rel="icon" href="[^"]*favicon\.ico" type="image\/x-icon">/,'<link rel="icon" href="/favicon.ico" type="image/x-icon">').replace(/src="[^"]*assets\/brand\/favicon\.png"/g,'src="/assets/brand/favicon.png"')}}}}
 
 const inputs=['index.html','profile/index.html','skills/index.html','eidolons/index.html','library/index.html','404.html'].map(file=>resolve(root,file));
-export default defineConfig({root,base:'./',plugins:[contentIntegrity(),staticContent(),sharedFavicon()],build:{target:'es2022',outDir:'../dist',emptyOutDir:true,rollupOptions:{input:inputs}}});
+export default defineConfig({root,base:'./',plugins:[contentIntegrity(),staticContent(),sharedRootAssets()],build:{target:'es2022',outDir:'../dist',emptyOutDir:true,rollupOptions:{input:inputs}}});

@@ -5,7 +5,7 @@ const heading=(index:string,kicker:string,title:string,description?:string)=>
  `<header class="page-heading${description?'':' page-heading--compact'}"><p class="eyebrow">${index} · ${kicker}</p><h1>${title}</h1>${description?`<p>${description}</p>`:''}</header>`;
 
 export function homePage():string{
- return`<section class="hero" aria-labelledby="hero-title"><div class="hero-text"><p class="eyebrow">THE CROWN OF STRIFE · 角色专题</p><h1 id="hero-title"><span>万敌</span><small>MYDEIMOS</small></h1><blockquote>不死的迈德漠斯，离群的狮子，逐猎「纷争」火种的黄金裔。</blockquote><div class="hero-actions"><a class="button primary" href="./profile/">查看角色档案</a><a class="button ghost" href="./skills/">查看技能</a></div></div><div class="hero-art"><picture><source media="(max-width:768px)" srcset="./images/img_mydei-768.webp"><img src="./images/img_mydei-1280.webp" alt="万敌手持长枪立于战场，身后是红色战旗与士兵" width="1280" height="1280" fetchpriority="high"></picture><span class="hero-seal">纷争<br>不死</span></div></section>`;
+ return`<section class="hero" aria-labelledby="hero-title"><div class="hero-text"><p class="eyebrow">THE CROWN OF STRIFE · 角色专题</p><h1 id="hero-title"><span>万敌</span><small>MYDEIMOS</small></h1><blockquote>不死的迈德漠斯，离群的狮子，逐猎「纷争」火种的黄金裔。</blockquote><div class="hero-actions"><a class="button primary" href="./profile/">查看角色档案</a><a class="button ghost" href="./skills/">查看技能</a></div></div><div class="hero-art"><picture><source media="(max-width:768px)" srcset="./images/img_mydei-768.webp"><img src="./images/img_mydei-1280.webp" alt="万敌手持长枪立于战场，身后是红色战旗与士兵" width="1280" height="1280" fetchpriority="high"></picture></div></section>`;
 }
 
 export function profilePage(stats:ProfileField[],ascension:DisplayValue[],traces:TraceGraph,introduction:CharacterProfileContent,stories:CharacterStory[]):string{

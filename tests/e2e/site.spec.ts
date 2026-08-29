@@ -20,6 +20,10 @@ test('all public pages share navigation, footer, SEO, and responsive bounds',asy
   await expect(page.locator('link[rel="icon"]')).toHaveAttribute('type','image/x-icon');
   await expect(page.locator('h1')).toContainText(heading);
   await expect(page.locator('.site-header')).toBeVisible();
+  const headerBrand=page.locator('.site-header .brand');
+  await expect(headerBrand.locator('.brand-mark')).toHaveCount(0);
+  const headerBrandIcon=headerBrand.locator('.brand-icon');await expect(headerBrandIcon).toHaveAttribute('src','/assets/brand/favicon.png');await expect(headerBrandIcon).toHaveAttribute('alt','黄金蜜饼');await expect(headerBrandIcon).toHaveAttribute('width','858');await expect(headerBrandIcon).toHaveAttribute('height','858');
+  expect(await headerBrand.evaluate(anchor=>new URL((anchor as HTMLAnchorElement).href).pathname)).toBe('/');
   await expect(page.locator('.site-footer')).toBeVisible();
   await expect(page.locator('.footer-intro>p>span')).toHaveText(footerIntroduction);
   await expect(page.locator('.site-footer>div')).toHaveCount(2);
@@ -55,6 +59,8 @@ test('home is one Hero with the frozen copy and two page CTAs',async({page})=>{
  await expect(page.locator('main>.hero')).toHaveCount(1);
  await expect(page.locator('main>*')).toHaveCount(1);
  await expect(page.locator('.hero blockquote')).toHaveText('不死的迈德漠斯，离群的狮子，逐猎「纷争」火种的黄金裔。');
+ await expect(page.locator('.hero-seal')).toHaveCount(0);
+ await expect(page.locator('.hero-art>:not(picture)')).toHaveCount(0);
  await expect(page.getByRole('link',{name:'查看角色档案'})).toHaveAttribute('href','./profile/');
  await expect(page.getByRole('link',{name:'查看技能'})).toHaveAttribute('href','./skills/');
  const text=await page.locator('body').innerText();
@@ -119,6 +125,8 @@ test('profile introduction and four stories support links, disclosure, keyboard,
 
 test('navigation supports desktop, touch layouts, keyboard close, and focus return',async({page})=>{
  await page.goto('/skills/');
+ const brand=page.locator('.site-header .brand');await brand.focus();await expect(brand).toBeFocused();
+ const brandIcon=brand.locator('.brand-icon');await expect(brandIcon).toBeVisible();const iconBox=await brandIcon.boundingBox();expect(iconBox).not.toBeNull();if(!iconBox)throw new Error('Missing brand icon bounds');expect(iconBox.width).toBeCloseTo(iconBox.height,1);await expect(brandIcon).toHaveCSS('object-fit','contain');
  if((page.viewportSize()?.width??999)>900){await expect(page.locator('[data-nav-links]')).toBeVisible();return}
  const toggle=page.locator('[data-nav-toggle]');await expect(toggle).toBeVisible();await toggle.click();await expect(toggle).toHaveAttribute('aria-expanded','true');await expect(page.locator('[data-nav-links]')).toBeVisible();await page.keyboard.press('Escape');await expect(toggle).toHaveAttribute('aria-expanded','false');await expect(toggle).toBeFocused();
 });

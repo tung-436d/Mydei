@@ -8,7 +8,7 @@ const navigation:[ActivePage,string,string][]=[
 
 export function siteHeader(base:string,active?:ActivePage):string{
  const links=navigation.map(([id,label,path])=>`<a href="${base}${path}"${active===id?' aria-current="page"':''}>${label}</a>`).join('');
- return`<header class="site-header" data-header><nav class="nav-shell" aria-label="主要导航"><a class="brand" href="${base}" aria-label="万敌专题站首页"><span class="brand-mark" aria-hidden="true">M</span><span><strong>万敌</strong><small>MYDEI ARCHIVE</small></span></a><button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" data-nav-toggle><span class="sr-only">打开导航</span><span></span><span></span></button><div class="nav-links" id="site-nav" data-nav-links>${links}</div></nav></header>`;
+ return`<header class="site-header" data-header><nav class="nav-shell" aria-label="主要导航"><a class="brand" href="${base}" aria-label="万敌专题站首页"><img class="brand-icon" src="/assets/brand/favicon.png" alt="黄金蜜饼" width="858" height="858"><span class="brand-copy"><strong>万敌</strong><small>MYDEI ARCHIVE</small></span></a><button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" data-nav-toggle><span class="sr-only">打开导航</span><span></span><span></span></button><div class="nav-links" id="site-nav" data-nav-links>${links}</div></nav></header>`;
 }
 
 const disclaimer='<p class="footer-disclaimer"><span>本站为万敌厨创作的非官方网站。</span><span>游戏相关的图像和资产的版权和商标权归 HoYoverse 所有。</span></p>';
