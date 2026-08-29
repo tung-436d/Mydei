@@ -12,7 +12,7 @@ const contentBundle={assets,stats,skills,traces,eidolons,profileIntroduction,cha
 function contentIntegrity():Plugin{return{name:'mydei-content-integrity',buildStart(){const issues=validateContent(contentBundle);if(issues.length)throw new Error(`Content validation failed:\n${issues.map(issue=>`${issue.code} ${issue.path}: ${issue.message}`).join('\n')}`)}}}
 
 const documents=new Map<string,string>([
- ['/index.html',documentMarkup({title:'万敌｜崩坏：星穹铁道角色专题',description:'以万敌为唯一主角的中文玩家专题首页。',body:homePage(),base:'./',active:'home',path:'/',script:'./src/app.ts',footerVariant:'compact'})],
+ ['/index.html',documentMarkup({title:'万敌｜崩坏：星穹铁道角色专题',description:'以万敌为唯一主角的中文玩家专题首页。',body:homePage(),base:'./',active:'home',path:'/',script:'./src/app.ts'})],
  ['/profile/index.html',documentMarkup({title:'角色档案｜万敌',description:'万敌的基础资料、完整角色介绍与角色故事一至四。',body:profilePage(stats,ascension,traces,profileIntroduction,characterStories),base:'../',active:'profile',path:'/profile/',script:'../src/app.ts'})],
  ['/skills/index.html',documentMarkup({title:'技能｜万敌',description:'万敌的普攻、战技形态、终结技、天赋、秘技与附加能力。',body:skillsPage(skills),base:'../',active:'skills',path:'/skills/',script:'../src/app.ts'})],
  ['/eidolons/index.html',documentMarkup({title:'星魂｜万敌',description:'万敌一至六阶星魂的名称、说明与本地静态图片。',body:eidolonsPage(eidolons),base:'../',active:'eidolons',path:'/eidolons/',script:'../src/app.ts'})],
