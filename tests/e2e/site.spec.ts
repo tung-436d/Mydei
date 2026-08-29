@@ -15,6 +15,9 @@ test('all public pages share navigation, footer, SEO, and responsive bounds',asy
   await page.goto(path);
   await expect(page).toHaveTitle(title);
   await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content',title);
+  await expect(page.locator('link[rel="icon"]')).toHaveCount(1);
+  await expect(page.locator('link[rel="icon"]')).toHaveAttribute('href','/favicon.ico');
+  await expect(page.locator('link[rel="icon"]')).toHaveAttribute('type','image/x-icon');
   await expect(page.locator('h1')).toContainText(heading);
   await expect(page.locator('.site-header')).toBeVisible();
   await expect(page.locator('.site-footer')).toBeVisible();
@@ -40,8 +43,10 @@ test('all public pages share navigation, footer, SEO, and responsive bounds',asy
  }
  await page.goto('/404.html');
  await expect(page).toHaveTitle('页面未找到');
+ await expect(page.locator('link[rel="icon"]')).toHaveAttribute('href','/favicon.ico');
  await expect(page.locator('.footer-intro>p>span')).toHaveText(footerIntroduction);
  await expect(page.locator('.footer-contact li')).toHaveText(footerContacts);
+ const favicon=await page.request.get('/favicon.ico');expect(favicon.status()).toBe(200);expect((await favicon.body()).byteLength).toBeGreaterThan(0);
  expect(pageErrors).toEqual([]);
 });
 
