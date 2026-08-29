@@ -2,8 +2,8 @@ import{get}from'node:http';
 import{expect,test}from'@playwright/test';
 
 const disclaimer=['本站为万敌厨创作的非官方网站。','游戏相关的图像和资产的版权和商标权归 HoYoverse 所有。'];
-const navLabels=['首页','角色档案','技能','星魂','馆藏','图集'];
-const pages=[['/',/万敌/],['/profile/',/角色档案/],['/skills/',/^技能$/],['/eidolons/',/^星魂$/],['/library/',/歌耳巴尼帕耳图书馆藏/],['/gallery/',/^图集$/]]as const;
+const navLabels=['首页','角色档案','技能','星魂','馆藏'];
+const pages=[['/',/万敌/],['/profile/',/角色档案/],['/skills/',/^技能$/],['/eidolons/',/^星魂$/],['/library/',/歌耳巴尼帕耳图书馆藏/]]as const;
 const rawGet=(origin:string,path:string)=>new Promise<{status:number;location?:string;body:string}>((resolve,reject)=>{get(`${origin}${path}`,response=>{let body='';response.setEncoding('utf8');response.on('data',chunk=>body+=chunk);response.on('end',()=>resolve({status:response.statusCode??0,location:response.headers.location,body}))}).on('error',reject)});
 
 test('all public pages share navigation, footer, SEO, and responsive bounds',async({page})=>{
@@ -37,7 +37,7 @@ test('home is one Hero with the frozen copy and two page CTAs',async({page})=>{
 
 test('requested page headings omit descriptions without leaving placeholder space',async({page})=>{
  const compactPages=[
-  ['/profile/','浏览万敌已确认的身份、属性、晋阶、行迹与角色介绍。','.profile-intro'],
+  ['/profile/','浏览万敌已确认的身份、属性、晋阶、行迹与角色介绍。','.profile-page-nav'],
   ['/skills/','按稳定锚点浏览普攻、战技形态、终结技、天赋、秘技和附加能力。','.local-nav'],
   ['/eidolons/','六阶星魂以本地图标与静态图片呈现，断网时仍可阅读完整说明。','.local-nav'],
  ]as const;
@@ -58,12 +58,26 @@ test('requested page headings omit descriptions without leaving placeholder spac
  expect(titleGap).toBeLessThanOrEqual(36);
 });
 
-test('profile, skills, eidolons, and gallery expose migrated content',async({page},testInfo)=>{
+test('profile, skills, and eidolons expose migrated content',async({page},testInfo)=>{
  test.skip(testInfo.project.name!=='desktop-1440','content matrix only needs one browser project');
- await page.goto('/profile/#stats');await expect(page.locator('#stats')).toBeVisible();await expect(page.locator('#ascension')).toBeAttached();await expect(page.locator('#traces')).toBeAttached();await expect(page.locator('#story')).toBeAttached();
+ await page.goto('/profile/#basic-info');await expect(page.locator('#basic-info')).toBeVisible();await expect(page.locator('#ascension')).toBeAttached();await expect(page.locator('#traces')).toBeAttached();await expect(page.locator('#introduction')).toBeAttached();await expect(page.locator('#stories')).toBeAttached();
  await page.goto('/skills/#skill-enhanced-king');await expect(page.locator('#skill-enhanced-king')).toContainText('弑王成王');await expect(page.locator('#skill-enhanced-god')).toContainText('弑神登神');await expect(page.locator('#bonus-abilities')).toContainText('水与泥土');
  await page.goto('/eidolons/#eidolon-06');await expect(page.locator('.eidolon-card')).toHaveCount(6);await expect(page.locator('#eidolon-06')).toContainText('往日攀陟沉积的血山');await expect(page.locator('.eidolon-card__poster')).toHaveCount(6);await expect(page.locator('.eidolon-card__icon')).toHaveCount(6);
- await page.goto('/gallery/');await expect(page.locator('.gallery-item')).toHaveCount(4);await page.locator('.gallery-item a').first().click();await expect(page.locator('[data-lightbox]')).toBeVisible();await page.keyboard.press('Escape');await expect(page.locator('[data-lightbox]')).not.toBeVisible();
+});
+
+test('profile introduction and four stories support links, disclosure, keyboard, and deep links',async({page},testInfo)=>{
+ test.skip(testInfo.project.name!=='desktop-1440','long-form behavior only needs one browser project');
+ await page.goto('/profile/');
+ await expect(page.locator('#introduction .prose>p')).toHaveCount(2);
+ await expect(page.locator('#introduction')).toContainText('那沉入迷雾的悬锋');
+ await expect(page.locator('#introduction')).not.toContainText('\\');
+ const knowledgeLinks=page.locator('#introduction a,.character-story__excerpt a');
+ await expect(knowledgeLinks).toHaveCount(6);
+ for(const link of await knowledgeLinks.all()){await expect(link).toHaveAttribute('target','_blank');await expect(link).toHaveAttribute('rel','noopener noreferrer')}
+ const stories=page.locator('.character-story');await expect(stories).toHaveCount(4);expect(await stories.evaluateAll(items=>items.every(item=>!(item as HTMLDetailsElement).open))).toBe(true);
+ const firstSummary=stories.first().locator('summary');await firstSummary.focus();await page.keyboard.press('Enter');await expect(stories.first()).toHaveAttribute('open','');await page.keyboard.press('Enter');await expect(stories.first()).not.toHaveAttribute('open','');
+ await page.goto('/profile/#character-story-3');await expect(page.locator('#character-story-3')).toHaveAttribute('open','');await expect(page.locator('#character-story-3 summary')).toBeFocused();
+ await expect(page.locator('#character-story-3 .character-story__annotation')).toContainText('——男人的批示');
 });
 
 test('navigation supports desktop, touch layouts, keyboard close, and focus return',async({page})=>{
@@ -88,7 +102,7 @@ test('core content remains readable without JavaScript',async({browser,viewport}
 test('page media stays local and image failures preserve readable fallback content',async({page},testInfo)=>{
  test.skip(testInfo.project.name!=='desktop-1440','network matrix only needs one browser project');
  const remoteMedia:string[]=[];page.on('request',request=>{if(['image','media'].includes(request.resourceType())&&new URL(request.url()).origin!=='http://127.0.0.1:4173')remoteMedia.push(request.url())});
- await page.goto('/profile/');await page.goto('/eidolons/');await page.locator('#eidolon-06').scrollIntoViewIfNeeded();await page.goto('/gallery/');expect(remoteMedia).toEqual([]);
+ await page.goto('/profile/');await page.locator('#character-story-4').scrollIntoViewIfNeeded();await page.goto('/eidolons/');await page.locator('#eidolon-06').scrollIntoViewIfNeeded();expect(remoteMedia).toEqual([]);
  await page.route('**/eidolon-01.webp',route=>route.abort());await page.goto('/eidolons/');await expect(page.locator('#eidolon-01 h2')).toContainText('寒风雕琢不屈的脊梁');await expect(page.locator('#eidolon-01 .eidolon-card__icon')).toBeVisible();
 });
 
@@ -109,5 +123,5 @@ test('secondary text reaches WCAG AA contrast and landmarks have accessible name
 test('legacy route matrix returns exact 301 and real 404 responses',async({baseURL},testInfo)=>{
  test.skip(testInfo.project.name!=='desktop-1440','route matrix only needs one browser project');const origin=baseURL??'http://127.0.0.1:4173';
  for(const[path,location]of [['/index.html','/'],['/HomePage/homepage.html','/'],['/About/about.html','/library/#golden-honeycake'],['/About/Library/library.html','/library/'],['/About/index.html','/profile/#site-info'],['/about/','/profile/#site-info']]as const){const response=await rawGet(origin,path);expect(response.status,path).toBe(301);expect(response.location,path).toBe(location)}
- for(const path of ['/About/Record/record.html','/ChangeLog/changelog.html','/changelog/','/sources/','/builds/','/guides/','/teams/','/rotation/','/not-a-real-page','/404.html']){const response=await rawGet(origin,path);expect(response.status,path).toBe(404);expect(response.body).toContain('你访问的地址不存在')}
+ for(const path of ['/About/Record/record.html','/ChangeLog/changelog.html','/changelog/','/sources/','/builds/','/guides/','/teams/','/rotation/','/gallery/','/gallery/index.html','/not-a-real-page','/404.html']){const response=await rawGet(origin,path);expect(response.status,path).toBe(404);expect(response.body).toContain('你访问的地址不存在')}
 });

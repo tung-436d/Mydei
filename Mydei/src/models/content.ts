@@ -9,9 +9,10 @@ export interface TraceGraph{nodes:TraceNode[]}
 export interface LocalMediaAsset{path:string;mimeType:'image/webp'|'image/gif'|'image/apng'|'video/webm'|'video/mp4';width:number;height:number;byteSize:number;alt:string}
 export interface EidolonMediaSet{icon:LocalMediaAsset;poster:LocalMediaAsset}
 export interface Eidolon{id:`eidolon-${'01'|'02'|'03'|'04'|'05'|'06'}`;level:EidolonLevel;name:string;description:string[];media:EidolonMediaSet}
-export interface LoreEvent{id:string;label:string;dateText?:string;precision:'exact'|'approximate'|'relative'|'unknown';title:string;body:string[]}
 export interface ProfileField{label:string;value:string}
-export interface GalleryItem{id:string;assetId:string;caption:string}
+export interface KnowledgeLink{paragraphIndex:number;label:string;href:string}
+export interface CharacterProfileContent{paragraphs:string[];links:KnowledgeLink[]}
+export interface CharacterStory{id:`character-story-${1|2|3|4}`;title:string;unlockLevel:20|40|60|80;paragraphs:string[];excerptSource:{label:string;title:string};annotation:{text:string;attribution:string};links:KnowledgeLink[]}
 export interface LibrarySection{heading?:string;paragraphs:string[]}
 export interface LibraryEntryData{id:string;category:string;title:string;summary:string;sections:LibrarySection[];defaultOpen?:boolean;spoilerLevel?:'none'|'minor'|'major'}
 export interface ReleaseInfo{siteVersion:string;buildDate:string;contentVersion:string}

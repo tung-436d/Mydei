@@ -1,15 +1,14 @@
 # 万敌角色专题站
 
-《崩坏：星穹铁道》万敌中文角色专题站。站点采用 Vite、TypeScript 和语义化静态 HTML，提供角色档案、技能、星魂、馆藏与图集。
+《崩坏：星穹铁道》万敌中文角色专题站。站点采用 Vite、TypeScript 和语义化静态 HTML，提供角色档案、技能、星魂与馆藏。
 
 ## 页面结构
 
 - `/`：一屏专题首页
-- `/profile/`：角色档案、属性、晋阶、行迹与故事
+- `/profile/`：基础资料、完整角色介绍与角色故事一至四
 - `/skills/`：技能、强化形态与附加能力
 - `/eidolons/`：E1–E6 星魂与本地静态图片
 - `/library/`：17 篇馆藏全文与目录
-- `/gallery/`：本地图集
 - `/404.html`：统一的真实错误页
 
 旧地址由开发与预览服务器按架构清单返回 301 或 404，不再产出旧版 HTML。
@@ -45,7 +44,7 @@ pnpm test:e2e
 
 ## 内容维护
 
-页面组件与内容数据位于 `Mydei/src/`，技能和星魂分别位于 `Mydei/src/content/mydei/skills.ts` 与 `eidolons.ts`，馆藏正文位于 `library.ts`。星魂媒体位于 `Mydei/public/assets/mydei/eidolons/`，页面只使用项目内相对路径。结构校验会检查重复 ID、图片引用、行迹依赖、必填文本及馆藏正文完整性。
+页面组件与内容数据位于 `Mydei/src/`。完整角色介绍和四篇角色故事分别位于 `Mydei/src/content/mydei/profile.ts` 与 `stories.ts`，技能和星魂位于 `skills.ts` 与 `eidolons.ts`，馆藏正文位于 `library.ts`。星魂媒体位于 `Mydei/public/assets/mydei/eidolons/`，页面只使用项目内相对路径。结构校验会检查重复 ID、知识链接、故事顺序、Markdown 换行残留、图片引用、行迹依赖及必填文本。
 
 ## Cloudflare Pages
 
