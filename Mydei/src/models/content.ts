@@ -1,19 +1,14 @@
 export type EidolonLevel=1|2|3|4|5|6;
-export type SkillKind='basic'|'skill'|'ultimate'|'talent'|'technique'|'enhanced'|'other';
+export type SkillCategory='basic'|'skill'|'ultimate'|'talent'|'technique'|'bonus-ability';
 
 export interface AssetRef{id:string;src:string;alt:string;width:number;height:number;usage:'hero'|'content'|'thumbnail'|'decorative'|'social';loading?:'eager'|'lazy';fetchPriority?:'high'|'low'|'auto'}
 export interface DisplayValue{label:string;value:string;context?:string}
-export interface Skill{id:string;skillKind:SkillKind;name:string;description:string[];mechanics:DisplayValue[];scaling?:SkillScaling[];tags:string[];gameVersion?:string}
-export interface SkillScaling{level:string;form?:string;values:DisplayValue[]}
+export interface Skill{id:string;category:SkillCategory;name:string;typeLabel?:string;parentSkillId?:string;formId?:string;isAutomatic?:boolean;description:string[];mechanics:DisplayValue[];gameVersion?:string}
 export interface TraceNode{id:string;name:string;nodeKind:'major'|'minor'|'stat';description:string[];prerequisiteIds:string[];visualPosition?:{column:number;row:number}}
 export interface TraceGraph{nodes:TraceNode[]}
-export interface Eidolon{id:string;level:EidolonLevel;name:string;description:string[];image?:AssetRef}
-export interface BuildOption{id:string;category:'equipment'|'relic'|'ornament'|'stat'|'other';label:string;rank?:'preferred'|'alternative'|'situational';rationale:string[]}
-export interface BuildRecommendation{id:string;title:string;useCase:string;priorities:DisplayValue[];options:BuildOption[];caveats:string[];gameVersion?:string}
-export interface TeamSlot{id:string;role:string;primaryCharacterId?:string;alternativeCharacterIds:string[];rationale:string[]}
-export interface TeamComposition{id:string;title:string;useCase:string;slots:TeamSlot[];notes:string[];rotationId?:string;gameVersion?:string}
-export interface RotationStep{id:string;actorId?:string;action:string;condition?:string;result?:string}
-export interface CombatRotation{id:string;title:string;prerequisites:string[];steps:RotationStep[];exceptions:string[]}
+export interface LocalMediaAsset{path:string;mimeType:'image/webp'|'image/gif'|'image/apng'|'video/webm'|'video/mp4';width:number;height:number;byteSize:number;alt:string}
+export interface EidolonMediaSet{icon:LocalMediaAsset;poster:LocalMediaAsset}
+export interface Eidolon{id:`eidolon-${'01'|'02'|'03'|'04'|'05'|'06'}`;level:EidolonLevel;name:string;description:string[];media:EidolonMediaSet}
 export interface LoreEvent{id:string;label:string;dateText?:string;precision:'exact'|'approximate'|'relative'|'unknown';title:string;body:string[]}
 export interface ProfileField{label:string;value:string}
 export interface GalleryItem{id:string;assetId:string;caption:string}

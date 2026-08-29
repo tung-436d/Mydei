@@ -1,4 +1,6 @@
-import{initGallery}from'./controllers/gallery';import{initImageFallbacks}from'./controllers/image-fallback';import{initNavigation}from'./controllers/navigation';import{initSectionSpy}from'./controllers/section-spy';import{initTabs}from'./controllers/tabs';
+import{initImageFallbacks}from'./controllers/image-fallback';import{initNavigation}from'./controllers/navigation';
 document.documentElement.classList.add('js');
-const cleanups=[initNavigation(),initTabs(),initGallery(),initImageFallbacks(),initSectionSpy()];
+const legacyHashes:Record<string,string>={'#overview':'./profile/','#skills':'./skills/','#eidolons':'./eidolons/','#story':'./profile/#story','#gallery':'./gallery/','#builds':'./404.html','#teams':'./404.html','#rotation':'./404.html'};
+const legacyTarget=legacyHashes[window.location.hash];if(legacyTarget)window.location.replace(legacyTarget);
+const cleanups=[initNavigation(),initImageFallbacks()];
 window.addEventListener('pagehide',()=>cleanups.forEach(cleanup=>cleanup()),{once:true});

@@ -1,25 +1,90 @@
-import{get}from'node:http';import{expect,test}from'@playwright/test';
+import{get}from'node:http';
+import{expect,test}from'@playwright/test';
 
 const disclaimer=['本站为万敌厨创作的非官方网站。','游戏相关的图像和资产的版权和商标权归 HoYoverse 所有。'];
-const navLabels=['概览','技能','养成','配队','故事','馆藏'];
+const navLabels=['首页','角色档案','技能','星魂','馆藏','图集'];
+const pages=[['/',/万敌/],['/profile/',/角色档案/],['/skills/',/^技能$/],['/eidolons/',/^星魂$/],['/library/',/歌耳巴尼帕耳图书馆藏/],['/gallery/',/^图集$/]]as const;
 const rawGet=(origin:string,path:string)=>new Promise<{status:number;location?:string;body:string}>((resolve,reject)=>{get(`${origin}${path}`,response=>{let body='';response.setEncoding('utf8');response.on('data',chunk=>body+=chunk);response.on('end',()=>resolve({status:response.statusCode??0,location:response.headers.location,body}))}).on('error',reject)});
 
-test('home and library are complete, shared, and overflow-free',async({page})=>{
+test('all public pages share navigation, footer, SEO, and responsive bounds',async({page})=>{
  const pageErrors:string[]=[];page.on('pageerror',error=>pageErrors.push(error.message));
- for(const[path,heading]of [['/',/万敌/],['/library/',/歌耳巴尼帕耳图书馆藏/]]as const){await page.goto(path);await expect(page.locator('h1')).toContainText(heading);await expect(page.locator('.site-header')).toBeVisible();await expect(page.locator('.site-footer')).toBeVisible();expect(await page.locator('.nav-links a').allTextContents()).toEqual(navLabels);for(const text of disclaimer)await expect(page.locator('.footer-disclaimer')).toContainText(text);const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);expect(overflow,`${path} has horizontal overflow`).toBeLessThanOrEqual(1)}
+ for(const[path,heading]of pages){
+  await page.goto(path);
+  await expect(page.locator('h1')).toContainText(heading);
+  await expect(page.locator('.site-header')).toBeVisible();
+  await expect(page.locator('.site-footer')).toBeVisible();
+  expect(await page.locator('.nav-links a').allTextContents()).toEqual(navLabels);
+  await expect(page.locator('.nav-links [aria-current="page"]')).toHaveCount(1);
+  for(const text of disclaimer)await expect(page.locator('.footer-disclaimer')).toContainText(text);
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href',new RegExp(`^https://mydeimos\\.love${path.replaceAll('/','\\/')}$`));
+  await expect(page.locator('meta[property="og:url"]')).toHaveAttribute('content',new RegExp(`^https://mydeimos\\.love${path.replaceAll('/','\\/')}$`));
+  const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);
+  expect(overflow,`${path} has horizontal overflow`).toBeLessThanOrEqual(1);
+ }
  expect(pageErrors).toEqual([]);
 });
 
-test('provided character content is directly visible',async({page})=>{await page.goto('/');await expect(page.locator('.hero blockquote')).toHaveText('不死的迈德漠斯，离群的狮子，逐猎「纷争」火种的黄金裔。');await expect(page.locator('.quote-card')).toHaveCount(0);await expect(page.getByRole('heading',{name:'踏破征途的誓言'})).toBeVisible();await expect(page.locator('#panel-eidolons h3',{hasText:'寒风雕琢不屈的脊梁'})).toBeAttached();await expect(page.locator('[data-gallery] img')).toHaveCount(4);const text=await page.locator('body').innerText();for(const blocked of ['一个以万敌为唯一主角、兼顾角色设定、战斗理解、养成决策与视觉气质的中文玩家专题。','内容审核中','授权待确认','核验后发布','待核验','待补充','勘误'])expect(text).not.toContain(blocked)});
+test('home is one Hero with the frozen copy and two page CTAs',async({page})=>{
+ await page.goto('/');
+ await expect(page.locator('main>.hero')).toHaveCount(1);
+ await expect(page.locator('main>*')).toHaveCount(1);
+ await expect(page.locator('.hero blockquote')).toHaveText('不死的迈德漠斯，离群的狮子，逐猎「纷争」火种的黄金裔。');
+ await expect(page.getByRole('link',{name:'查看角色档案'})).toHaveAttribute('href','./profile/');
+ await expect(page.getByRole('link',{name:'查看技能'})).toHaveAttribute('href','./skills/');
+ const text=await page.locator('body').innerText();
+ for(const blocked of ['查看玩法建议','内容审核中','授权待确认','核验后发布','待核验','待补充','勘误'])expect(text).not.toContain(blocked);
+});
 
-test('mobile navigation and keyboard tabs are operable',async({page})=>{await page.goto('/');if((page.viewportSize()?.width??999)>900){await expect(page.locator('[data-nav-links]')).toBeVisible()}else{const toggle=page.locator('[data-nav-toggle]');await expect(toggle).toBeVisible();await toggle.click();await expect(toggle).toHaveAttribute('aria-expanded','true');await page.keyboard.press('Escape');await expect(toggle).toHaveAttribute('aria-expanded','false');await expect(toggle).toBeFocused()}const first=page.locator('[data-tab]').first();await first.focus();await page.keyboard.press('ArrowRight');await expect(page.locator('[data-tab]').nth(1)).toHaveAttribute('aria-selected','true')});
+test('profile, skills, eidolons, and gallery expose migrated content',async({page},testInfo)=>{
+ test.skip(testInfo.project.name!=='desktop-1440','content matrix only needs one browser project');
+ await page.goto('/profile/#stats');await expect(page.locator('#stats')).toBeVisible();await expect(page.locator('#ascension')).toBeAttached();await expect(page.locator('#traces')).toBeAttached();await expect(page.locator('#story')).toBeAttached();
+ await page.goto('/skills/#skill-enhanced-king');await expect(page.locator('#skill-enhanced-king')).toContainText('弑王成王');await expect(page.locator('#skill-enhanced-god')).toContainText('弑神登神');await expect(page.locator('#bonus-abilities')).toContainText('水与泥土');
+ await page.goto('/eidolons/#eidolon-06');await expect(page.locator('.eidolon-card')).toHaveCount(6);await expect(page.locator('#eidolon-06')).toContainText('往日攀陟沉积的血山');await expect(page.locator('.eidolon-card__poster')).toHaveCount(6);await expect(page.locator('.eidolon-card__icon')).toHaveCount(6);
+ await page.goto('/gallery/');await expect(page.locator('.gallery-item')).toHaveCount(4);await page.locator('.gallery-item a').first().click();await expect(page.locator('[data-lightbox]')).toBeVisible();await page.keyboard.press('Escape');await expect(page.locator('[data-lightbox]')).not.toBeVisible();
+});
 
-test('library supports native disclosure, toolbar, and deep links',async({page})=>{await page.goto('/library/');const entries=page.locator('.library-entry');await expect(entries).toHaveCount(17);const second=entries.nth(1);await second.locator('summary').focus();await page.keyboard.press('Enter');await expect(second).toHaveAttribute('open','');await page.locator('[data-library-open-all]').click();expect(await entries.evaluateAll(items=>items.every(item=>(item as HTMLDetailsElement).open))).toBe(true);await page.locator('[data-library-close-all]').click();expect(await entries.evaluateAll(items=>items.every(item=>!(item as HTMLDetailsElement).open))).toBe(true);await page.goto('/library/#archive-02');const target=page.locator('#archive-02');await expect(target).toHaveAttribute('open','');await expect(target.locator('summary')).toBeFocused()});
+test('navigation supports desktop, touch layouts, keyboard close, and focus return',async({page})=>{
+ await page.goto('/skills/');
+ if((page.viewportSize()?.width??999)>900){await expect(page.locator('[data-nav-links]')).toBeVisible();return}
+ const toggle=page.locator('[data-nav-toggle]');await expect(toggle).toBeVisible();await toggle.click();await expect(toggle).toHaveAttribute('aria-expanded','true');await expect(page.locator('[data-nav-links]')).toBeVisible();await page.keyboard.press('Escape');await expect(toggle).toHaveAttribute('aria-expanded','false');await expect(toggle).toBeFocused();
+});
 
-test('core pages remain readable without JavaScript',async({browser,viewport})=>{const context=await browser.newContext({javaScriptEnabled:false,viewport:viewport??{width:1280,height:800}});const page=await context.newPage();await page.goto('http://127.0.0.1:4173/');await expect(page.locator('#skills')).toBeVisible();await expect(page.locator('[data-nav-links]')).toBeVisible();await page.goto('http://127.0.0.1:4173/library/');await expect(page.locator('.library-entry')).toHaveCount(17);await expect(page.locator('.library-entry').first()).toHaveAttribute('open','');await context.close()});
+test('library supports native disclosure, touch controls, and deep links',async({page},testInfo)=>{
+ test.skip(testInfo.project.name!=='desktop-1440','library behavior only needs one browser project');
+ await page.goto('/library/');const entries=page.locator('.library-entry');await expect(entries).toHaveCount(17);const second=entries.nth(1);await second.locator('summary').focus();await page.keyboard.press('Enter');await expect(second).toHaveAttribute('open','');await page.locator('[data-library-open-all]').click();expect(await entries.evaluateAll(items=>items.every(item=>(item as HTMLDetailsElement).open))).toBe(true);await page.locator('[data-library-close-all]').click();expect(await entries.evaluateAll(items=>items.every(item=>!(item as HTMLDetailsElement).open))).toBe(true);await page.goto('/library/#archive-02');await expect(page.locator('#archive-02')).toHaveAttribute('open','');await expect(page.locator('#archive-02 summary')).toBeFocused();
+});
 
-test('secondary text meets WCAG AA contrast',async({page})=>{await page.goto('/library/');const ratio=await page.locator('.library-entry[open] .library-entry__body p').first().evaluate(element=>{const rgb=(value:string)=>value.match(/[\d.]+/g)?.slice(0,3).map(Number)??[0,0,0];const luminance=(values:number[])=>{const channels=values.map(value=>{const normalized=value/255;return normalized<=.04045?normalized/12.92:((normalized+.055)/1.055)**2.4});return .2126*(channels[0]??0)+.7152*(channels[1]??0)+.0722*(channels[2]??0)};const style=getComputedStyle(element),background=getComputedStyle(element.closest('.library-entry__body')!);const foreground=luminance(rgb(style.color)),back=luminance(rgb(background.backgroundColor));return(Math.max(foreground,back)+.05)/(Math.min(foreground,back)+.05)});expect(ratio).toBeGreaterThanOrEqual(4.5)});
+test('core content remains readable without JavaScript',async({browser,viewport},testInfo)=>{
+ test.skip(testInfo.project.name!=='desktop-1440','no-JS matrix only needs one browser project');
+ const context=await browser.newContext({javaScriptEnabled:false,viewport:viewport??{width:1440,height:900}});const page=await context.newPage();
+ for(const[path]of pages){await page.goto(`http://127.0.0.1:4173${path}`);await expect(page.locator('h1')).toBeVisible();await expect(page.locator('[data-nav-links]')).toBeVisible()}
+ await page.goto('http://127.0.0.1:4173/skills/');await expect(page.locator('#skill-enhanced-god')).toContainText('弑神登神');
+ await context.close();
+});
 
-test('reduced motion and image failure states are handled',async({page})=>{await page.emulateMedia({reducedMotion:'reduce'});await page.goto('/');const duration=await page.locator('.button').first().evaluate(element=>getComputedStyle(element).transitionDuration);expect(Number.parseFloat(duration)).toBeLessThanOrEqual(.00001);await page.evaluate(()=>{const image=document.createElement('img');image.alt='测试素材';document.querySelector('#gallery')?.append(image);image.src='/definitely-missing-image.webp'});await expect(page.locator('.image-fallback')).toContainText('测试素材')});
+test('page media stays local and image failures preserve readable fallback content',async({page},testInfo)=>{
+ test.skip(testInfo.project.name!=='desktop-1440','network matrix only needs one browser project');
+ const remoteMedia:string[]=[];page.on('request',request=>{if(['image','media'].includes(request.resourceType())&&new URL(request.url()).origin!=='http://127.0.0.1:4173')remoteMedia.push(request.url())});
+ await page.goto('/profile/');await page.goto('/eidolons/');await page.locator('#eidolon-06').scrollIntoViewIfNeeded();await page.goto('/gallery/');expect(remoteMedia).toEqual([]);
+ await page.route('**/eidolon-01.webp',route=>route.abort());await page.goto('/eidolons/');await expect(page.locator('#eidolon-01 h2')).toContainText('寒风雕琢不屈的脊梁');await expect(page.locator('#eidolon-01 .eidolon-card__icon')).toBeVisible();
+});
 
-test('legacy route rules and real 404 responses are enforced',async({baseURL},testInfo)=>{test.skip(testInfo.project.name!=='desktop-1440','route matrix only needs one browser project');const origin=baseURL??'http://127.0.0.1:4173';for(const[path,location]of [['/index.html','/'],['/HomePage/homepage.html','/#overview'],['/About/about.html','/library/#golden-honeycake'],['/About/Library/library.html','/library/'],['/About/Record/record.html','/#rotation'],['/About/index.html','/#site-info'],['/about/','/#site-info']]as const){const response=await rawGet(origin,path);expect(response.status,path).toBe(301);expect(response.location,path).toBe(location)}for(const path of ['/ChangeLog/changelog.html','/ChangeLog/index.html','/changelog/','/sources/index.html','/sources/','/not-a-real-page','/404.html']){const response=await rawGet(origin,path);expect(response.status,path).toBe(404);expect(response.body).toContain('这一页不在馆藏中')}});
+test('reduced motion keeps the static-first presentation',async({page})=>{
+ await page.emulateMedia({reducedMotion:'reduce'});await page.goto('/library/');
+ const duration=await page.locator('.library-entry__indicator').first().evaluate(element=>getComputedStyle(element).transitionDuration);expect(Number.parseFloat(duration)).toBeLessThanOrEqual(.00001);
+ await page.goto('/profile/');
+ await expect(page.locator('video[autoplay],img[data-motion-src]')).toHaveCount(0);
+ await expect(page.locator('.portrait-card img')).toBeVisible();
+});
+
+test('secondary text reaches WCAG AA contrast and landmarks have accessible names',async({page},testInfo)=>{
+ test.skip(testInfo.project.name!=='desktop-1440','accessibility audit only needs one browser project');await page.goto('/library/');
+ const ratio=await page.locator('.library-entry[open] .library-entry__body p').first().evaluate(element=>{const rgb=(value:string)=>value.match(/[\d.]+/g)?.slice(0,3).map(Number)??[0,0,0];const luminance=(values:number[])=>{const channels=values.map(value=>{const normalized=value/255;return normalized<=.04045?normalized/12.92:((normalized+.055)/1.055)**2.4});return .2126*(channels[0]??0)+.7152*(channels[1]??0)+.0722*(channels[2]??0)};const style=getComputedStyle(element),background=getComputedStyle(element.closest('.library-entry__body')!);const foreground=luminance(rgb(style.color)),back=luminance(rgb(background.backgroundColor));return(Math.max(foreground,back)+.05)/(Math.min(foreground,back)+.05)});
+ expect(ratio).toBeGreaterThanOrEqual(4.5);await expect(page.getByRole('navigation',{name:'主要导航'})).toBeVisible();await expect(page.getByRole('main')).toBeVisible();
+});
+
+test('legacy route matrix returns exact 301 and real 404 responses',async({baseURL},testInfo)=>{
+ test.skip(testInfo.project.name!=='desktop-1440','route matrix only needs one browser project');const origin=baseURL??'http://127.0.0.1:4173';
+ for(const[path,location]of [['/index.html','/'],['/HomePage/homepage.html','/'],['/About/about.html','/library/#golden-honeycake'],['/About/Library/library.html','/library/'],['/About/index.html','/profile/#site-info'],['/about/','/profile/#site-info']]as const){const response=await rawGet(origin,path);expect(response.status,path).toBe(301);expect(response.location,path).toBe(location)}
+ for(const path of ['/About/Record/record.html','/ChangeLog/changelog.html','/changelog/','/sources/','/builds/','/guides/','/teams/','/rotation/','/not-a-real-page','/404.html']){const response=await rawGet(origin,path);expect(response.status,path).toBe(404);expect(response.body).toContain('你访问的地址不存在')}
+});
