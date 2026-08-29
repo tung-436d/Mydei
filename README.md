@@ -28,6 +28,8 @@ pnpm build
 pnpm exec vite preview --config vite.config.ts
 ```
 
+Windows 用户也可以直接双击项目根目录的 `start.bat`。脚本会检查 Node.js、npm 和项目配置，首次运行时自动安装依赖，随后启动开发服务器并打开 `http://127.0.0.1:5173/`；请保持脚本窗口开启。
+
 ## 验证
 
 ```bash
