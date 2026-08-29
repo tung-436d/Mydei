@@ -12,12 +12,12 @@ const contentBundle={assets,stats,skills,traces,eidolons,profileIntroduction,cha
 function contentIntegrity():Plugin{return{name:'mydei-content-integrity',buildStart(){const issues=validateContent(contentBundle);if(issues.length)throw new Error(`Content validation failed:\n${issues.map(issue=>`${issue.code} ${issue.path}: ${issue.message}`).join('\n')}`)}}}
 
 const documents=new Map<string,string>([
- ['/index.html',documentMarkup({title:'万敌｜崩坏：星穹铁道角色专题',description:'以万敌为唯一主角的中文玩家专题首页。',body:homePage(),base:'./',active:'home',path:'/',script:'./src/app.ts'})],
- ['/profile/index.html',documentMarkup({title:'角色档案｜万敌',description:'万敌的基础资料、完整角色介绍与角色故事一至四。',body:profilePage(stats,ascension,traces,profileIntroduction,characterStories),base:'../',active:'profile',path:'/profile/',script:'../src/app.ts'})],
- ['/skills/index.html',documentMarkup({title:'技能｜万敌',description:'万敌的普攻、战技形态、终结技、天赋、秘技与附加能力。',body:skillsPage(skills),base:'../',active:'skills',path:'/skills/',script:'../src/app.ts'})],
- ['/eidolons/index.html',documentMarkup({title:'星魂｜万敌',description:'万敌一至六阶星魂的名称、说明与本地静态图片。',body:eidolonsPage(eidolons),base:'../',active:'eidolons',path:'/eidolons/',script:'../src/app.ts'})],
- ['/library/index.html',documentMarkup({title:'歌耳巴尼帕耳图书馆藏｜万敌',description:'以深色高对比阅读界面浏览万敌专题站馆藏全文。',body:libraryPage(libraryEntries),base:'../',active:'library',path:'/library/',script:'../src/library.ts'})],
- ['/404.html',documentMarkup({title:'页面未找到｜万敌',description:'请求的页面不存在。',body:notFoundPage(),base:'./',path:'/404.html',script:'./src/app.ts'})],
+ ['/index.html',documentMarkup({title:'黄金蜜饼',description:'以万敌为唯一主角的中文玩家专题首页。',body:homePage(),base:'./',active:'home',path:'/',script:'./src/app.ts'})],
+ ['/profile/index.html',documentMarkup({title:'角色档案',description:'万敌的基础资料、完整角色介绍与角色故事一至四。',body:profilePage(stats,ascension,traces,profileIntroduction,characterStories),base:'../',active:'profile',path:'/profile/',script:'../src/app.ts'})],
+ ['/skills/index.html',documentMarkup({title:'技能',description:'万敌的普攻、战技形态、终结技、天赋、秘技与附加能力。',body:skillsPage(skills),base:'../',active:'skills',path:'/skills/',script:'../src/app.ts'})],
+ ['/eidolons/index.html',documentMarkup({title:'星魂',description:'万敌一至六阶星魂的名称、说明与本地静态图片。',body:eidolonsPage(eidolons),base:'../',active:'eidolons',path:'/eidolons/',script:'../src/app.ts'})],
+ ['/library/index.html',documentMarkup({title:'歌耳巴尼帕耳图书馆藏',description:'以深色高对比阅读界面浏览万敌专题站馆藏全文。',body:libraryPage(libraryEntries),base:'../',active:'library',path:'/library/',script:'../src/library.ts'})],
+ ['/404.html',documentMarkup({title:'页面未找到',description:'请求的页面不存在。',body:notFoundPage(),base:'./',path:'/404.html',script:'./src/app.ts'})],
 ]);
 
 const redirects=new Map<string,string>([

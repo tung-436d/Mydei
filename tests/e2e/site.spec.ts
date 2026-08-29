@@ -3,26 +3,31 @@ import{expect,test}from'@playwright/test';
 
 const disclaimer=['本站为万敌厨创作的非官方网站。','游戏相关的图像和资产的版权和商标权归 HoYoverse 所有。'];
 const footerIntroduction=['小敌小敌，我们喜欢你。','为万敌而设的非官方数字档案馆。收录其故事、轨迹与一切注脚。'];
-const removedFooterCopy=['由玩家整理、以万敌为唯一主角的中文角色专题站。','快捷入口','维护者：tung','tung-favorli@outlook.com','Bilibili：YvetteTung','返回顶部'];
+const footerContacts=['万敌吧','同好 QQ 群：430106260','Designed & Maintained by 二十铢 (Bilibili)'];
+const removedFooterCopy=['由玩家整理、以万敌为唯一主角的中文角色专题站。','快捷入口','维护者：tung','tung-favorli@outlook.com','Bilibili：YvetteTung','作者 B 站主页','返回顶部'];
 const navLabels=['首页','角色档案','技能','星魂','馆藏'];
-const pages=[['/',/万敌/],['/profile/',/角色档案/],['/skills/',/^技能$/],['/eidolons/',/^星魂$/],['/library/',/歌耳巴尼帕耳图书馆藏/]]as const;
+const pages=[['/',/万敌/,'黄金蜜饼'],['/profile/',/角色档案/,'角色档案'],['/skills/',/^技能$/,'技能'],['/eidolons/',/^星魂$/,'星魂'],['/library/',/歌耳巴尼帕耳图书馆藏/,'歌耳巴尼帕耳图书馆藏']]as const;
 const rawGet=(origin:string,path:string)=>new Promise<{status:number;location?:string;body:string}>((resolve,reject)=>{get(`${origin}${path}`,response=>{let body='';response.setEncoding('utf8');response.on('data',chunk=>body+=chunk);response.on('end',()=>resolve({status:response.statusCode??0,location:response.headers.location,body}))}).on('error',reject)});
 
 test('all public pages share navigation, footer, SEO, and responsive bounds',async({page})=>{
  const pageErrors:string[]=[];page.on('pageerror',error=>pageErrors.push(error.message));
- for(const[path,heading]of pages){
+ for(const[path,heading,title]of pages){
   await page.goto(path);
+  await expect(page).toHaveTitle(title);
+  await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content',title);
   await expect(page.locator('h1')).toContainText(heading);
   await expect(page.locator('.site-header')).toBeVisible();
   await expect(page.locator('.site-footer')).toBeVisible();
   await expect(page.locator('.footer-intro>p>span')).toHaveText(footerIntroduction);
   await expect(page.locator('.site-footer>div')).toHaveCount(2);
   await expect(page.locator('.footer-contact h2')).toHaveText('联系');
-  await expect(page.locator('.footer-contact li')).toHaveText(['万敌吧','同好 QQ 群：430106260','作者 B 站主页']);
+  await expect(page.locator('.footer-contact li')).toHaveText(footerContacts);
   const contactLinks=page.locator('.footer-contact a');
   await expect(contactLinks).toHaveCount(2);
   await expect(contactLinks.nth(0)).toHaveAttribute('href','https://tieba.baidu.com/f?kw=%E4%B8%87%E6%95%8C&fr=personalize_page');
   await expect(contactLinks.nth(1)).toHaveAttribute('href','https://space.bilibili.com/499407441?spm_id_from=333.1007.0.0');
+  await expect(contactLinks.nth(1).locator('strong')).toHaveText('二十铢');
+  await expect(contactLinks.nth(1).locator('strong')).toHaveCount(1);
   for(const link of await contactLinks.all()){await expect(link).toHaveAttribute('target','_blank');await expect(link).toHaveAttribute('rel','noopener noreferrer')}
   const footerText=await page.locator('.site-footer').innerText();for(const text of removedFooterCopy)expect(footerText).not.toContain(text);
   expect(await page.locator('.nav-links a').allTextContents()).toEqual(navLabels);
@@ -34,8 +39,9 @@ test('all public pages share navigation, footer, SEO, and responsive bounds',asy
   expect(overflow,`${path} has horizontal overflow`).toBeLessThanOrEqual(1);
  }
  await page.goto('/404.html');
+ await expect(page).toHaveTitle('页面未找到');
  await expect(page.locator('.footer-intro>p>span')).toHaveText(footerIntroduction);
- await expect(page.locator('.footer-contact li')).toHaveText(['万敌吧','同好 QQ 群：430106260','作者 B 站主页']);
+ await expect(page.locator('.footer-contact li')).toHaveText(footerContacts);
  expect(pageErrors).toEqual([]);
 });
 
