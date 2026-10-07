@@ -21,10 +21,15 @@ export default defineConfig({
     name,
     use:{...devices['Desktop Chrome'],viewport:{width,height}},
   })),
-  webServer:{
+  webServer:[{
+    command:'node tests/helpers/archive-server.mjs',
+    url:'http://127.0.0.1:8787/api/archives/health',
+    reuseExistingServer:false,
+    timeout:60_000,
+  },{
     command:'pnpm exec vite preview --config vite.config.ts --host 127.0.0.1 --port 4173',
     url:'http://127.0.0.1:4173',
     reuseExistingServer:!process.env.CI,
     timeout:60_000,
-  },
+  }],
 });

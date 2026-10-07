@@ -1,0 +1,11 @@
+node_modules
+dist
+.git
+.env*
+deploy/archive.env
+*.db
+*.db-wal
+*.db-shm
+archive-data
+test-results
+playwright-report

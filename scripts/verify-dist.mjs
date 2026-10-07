@@ -5,14 +5,17 @@ import process from'node:process';
 const root=process.cwd(),dist=resolve(root,'dist'),source=resolve(root,'Mydei','src');
 const walk=async directory=>(await readdir(directory,{withFileTypes:true})).flatMap(entry=>entry.isDirectory()?[]:[resolve(directory,entry.name)]).concat(...await Promise.all((await readdir(directory,{withFileTypes:true})).filter(entry=>entry.isDirectory()).map(entry=>walk(resolve(directory,entry.name)))));
 const files=await walk(dist),html=files.filter(file=>file.endsWith('.html')).map(file=>relative(dist,file).replaceAll('\\','/')).sort();
-const expected=['404.html','eidolons/index.html','index.html','library/index.html','profile/index.html','skills/index.html'];
+const expected=['404.html','archive/index.html','eidolons/index.html','index.html','library/index.html','profile/index.html','skills/index.html'];
 if(JSON.stringify(html)!==JSON.stringify(expected))throw new Error(`Unexpected HTML output: ${html.join(', ')}`);
 
 for(const file of ['_redirects','robots.txt','sitemap.xml'])if(!files.includes(resolve(dist,file)))throw new Error(`Missing Cloudflare/SEO artifact: ${file}`);
 const favicon=await stat(resolve(dist,'favicon.ico'));if(favicon.size<=0)throw new Error('Missing or empty favicon.ico');
 const brandIcon=await stat(resolve(dist,'assets','brand','favicon.png'));if(brandIcon.size<=0)throw new Error('Missing or empty header brand icon');
 const sitemap=await readFile(resolve(dist,'sitemap.xml'),'utf8');
-for(const path of ['/','/profile/','/skills/','/eidolons/','/library/'])if(!sitemap.includes(`<loc>https://mydeimos.love${path}</loc>`))throw new Error(`Sitemap missing ${path}`);
+for(const path of ['/','/profile/','/skills/','/eidolons/','/library/','/archive/'])if(!sitemap.includes(`<loc>https://mydeimos.love${path}</loc>`))throw new Error(`Sitemap missing ${path}`);
+if(!files.some(file=>/sql-wasm-.*\.wasm$/.test(file)))throw new Error('Missing local SQLite WASM');
+if(!files.some(file=>/reader-worker-.*\.js$/.test(file)))throw new Error('Missing archive reader worker');
+if(files.some(file=>/(?:content\.db|scrape_info\.json|manifest\.json|index\.json)$/.test(file)))throw new Error('Private archive data must not be published in dist');
 if(sitemap.includes('/gallery/'))throw new Error('Sitemap still contains the retired gallery route');
 
 const media=[];for(let level=1;level<=6;level++){const id=String(level).padStart(2,'0');media.push(`assets/mydei/eidolons/eidolon-${id}-icon.webp`,`assets/mydei/eidolons/eidolon-${id}.webp`)}

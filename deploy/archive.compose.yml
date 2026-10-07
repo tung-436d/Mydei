@@ -1,0 +1,26 @@
+services:
+  archive-files:
+    build:
+      context: ..
+      dockerfile: services/tieba-archive-files/Dockerfile
+    restart: unless-stopped
+    init: true
+    env_file: archive.env
+    environment:
+      ARCHIVE_HOST: 0.0.0.0
+      ARCHIVE_DATA_DIR: /data/tieba-archives
+      NODE_OPTIONS: --max-old-space-size=128
+    ports:
+      - "127.0.0.1:8787:8787"
+    volumes:
+      - tieba-archives:/data/tieba-archives
+    mem_limit: 384m
+    cpus: 1.0
+    pids_limit: 64
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+volumes:
+  tieba-archives:
+    # Fixed name survives project-directory renames and container rebuilds.
+    name: mydei-tieba-archives

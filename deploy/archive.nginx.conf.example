@@ -1,0 +1,13 @@
+# Add inside the HTTPS vhost for mydeimos.love, or a same-site API subdomain.
+# Keep existing static frontend routing. Do not expose the data directory with alias/root.
+location ^~ /api/archives {
+    client_max_body_size 5m;
+    client_body_timeout 180s;
+    proxy_request_buffering off;
+    proxy_buffering off;
+    proxy_read_timeout 180s;
+    proxy_send_timeout 180s;
+    proxy_pass http://127.0.0.1:8787;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}

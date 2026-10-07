@@ -1,9 +1,9 @@
 import{escapeHtml}from'../render';
 
-export type ActivePage='home'|'profile'|'skills'|'eidolons'|'library';
+export type ActivePage='home'|'profile'|'skills'|'eidolons'|'library'|'archive';
 const origin='https://mydeimos.love';
 const navigation:[ActivePage,string,string][]=[
- ['home','首页',''],['profile','角色档案','profile/'],['skills','技能','skills/'],['eidolons','星魂','eidolons/'],['library','馆藏','library/'],
+ ['home','首页',''],['profile','角色档案','profile/'],['skills','技能','skills/'],['eidolons','星魂','eidolons/'],['library','馆藏','library/'],['archive','止戈遗录','archive/'],
 ];
 
 export function siteHeader(base:string,active?:ActivePage):string{

@@ -4,3 +4,12 @@ dist/
 *.log
 playwright-report/
 test-results/
+.env
+.env.local
+.env.*.local
+archive-data/
+*.db
+*.db-wal
+*.db-shm
+deploy/archive.env
+verification-results/
