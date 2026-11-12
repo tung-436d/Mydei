@@ -13,22 +13,6 @@
 
 旧地址由开发与预览服务器按架构清单返回 301 或 404，不再产出旧版 HTML。
 
-## 本地运行
-
-```bash
-pnpm install
-pnpm dev
-```
-
-默认访问 `http://localhost:5173/`。生产构建和预览：
-
-```bash
-pnpm build
-pnpm exec vite preview --config vite.config.ts
-```
-
-Windows 用户也可以直接双击项目根目录的 `start.bat`。脚本会检查 Node.js、npm 和项目配置，首次运行时自动安装依赖，随后启动开发服务器并打开 `http://127.0.0.1:5173/`；请保持脚本窗口开启。
-
 ## 验证
 
 ```bash
@@ -59,3 +43,5 @@ pnpm test:e2e
 正式域名为 `https://mydeimos.love`，canonical、Open Graph URL、`sitemap.xml` 和 `robots.txt` 均使用该 origin。本任务不执行部署或修改 Cloudflare 控制台。
 
 本站为万敌厨创作的非官方网站。游戏相关的图像和资产的版权和商标权归 HoYoverse 所有。
+
+在线访问：https://mydeimos.love
