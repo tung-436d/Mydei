@@ -1,5 +1,7 @@
 # 万敌角色专题站
 
+在线访问：https://mydeimos.love
+
 《崩坏：星穹铁道》万敌中文角色专题站。站点采用 Vite、TypeScript 和语义化静态 HTML，提供角色档案、技能、星魂与馆藏。
 
 ## 页面结构
@@ -43,5 +45,3 @@ pnpm test:e2e
 正式域名为 `https://mydeimos.love`，canonical、Open Graph URL、`sitemap.xml` 和 `robots.txt` 均使用该 origin。本任务不执行部署或修改 Cloudflare 控制台。
 
 本站为万敌厨创作的非官方网站。游戏相关的图像和资产的版权和商标权归 HoYoverse 所有。
-
-在线访问：https://mydeimos.love
